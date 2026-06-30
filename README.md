@@ -628,15 +628,126 @@ but it captures a structural dimension independent of the other two signals.
 
 ---
 
+## Stretch Feature: Provenance Certificate
+
+A creator can earn a **Verified Human** credential by completing an additional
+verification step on content that was classified as human-written. This
+certificate is **distinct from the standard transparency label** — it requires
+active creator participation, not just automated signal output.
+
+### Verification step
+
+`POST /verify`
+
+```json
+{
+  "content_id":  "uuid from /submit",
+  "creator_id":  "alice",
+  "attestation": "I wrote this review myself after visiting the restaurant
+                  last Tuesday. Every detail is from my own experience."
+}
+```
+
+Requirements for a certificate to be issued:
+- `content_id` must exist and have `verdict = "human"`
+- Confidence score must be ≥ 0.40 (some signal required)
+- Attestation must be ≥ 20 characters
+- No certificate already issued for this content
+
+**Response:**
+```json
+{
+  "success":    true,
+  "cert_id":    "3d6a92d4-2b98-4e13-8cf8-09ad618a74f5",
+  "content_id": "a89dfcc7-...",
+  "creator_id": "alice",
+  "issued_at":  "2026-06-30T07:20:49Z",
+  "message":    "Certificate issued. This content is now marked as Verified Human-Written.",
+  "label": {
+    "heading":      "✅ Verified Human-Written",
+    "badge":        "VERIFIED HUMAN",
+    "icon":         "🏅",
+    "body":         "The creator has verified authorship of this content through our attestation process.",
+    "detail":       "Certificate ID: 3d6a92d4... — Issued: 2026-06-30T07:20:49Z.",
+    "creator_note": "Verified by creator 'alice'. Creator-attested, not a guarantee.",
+    "cert_id":      "3d6a92d4-...",
+    "issued_at":    "2026-06-30T07:20:49Z"
+  }
+}
+```
+
+### Retrieve a certificate
+
+`GET /certificate/<content_id>` — returns the full certificate including
+the verified label, or 404 if no certificate exists.
+
+### How the certificate label differs from the standard human label
+
+| Field | Standard Human Label | Certificate Label |
+|---|---|---|
+| `badge` | `HUMAN-WRITTEN` | `VERIFIED HUMAN` |
+| `icon` | `✍️` | `🏅` |
+| `heading` | `✅ Likely Human-Written` | `✅ Verified Human-Written` |
+| Source | Automated signals only | Automated signals + creator attestation |
+| `cert_id` | not present | UUID — uniquely identifies the certificate |
+| `issued_at` | not present | ISO 8601 timestamp of verification |
+
+A reader seeing `VERIFIED HUMAN` knows the creator actively stepped forward
+to attest authorship — it is a stronger claim than the automated `HUMAN-WRITTEN` label.
+
+---
+
+## Stretch Feature: Analytics Dashboard
+
+`GET /stats` — returns platform-level metrics.
+
+**Live example output:**
+```json
+{
+  "generated_at":      "2026-06-30T07:21:06Z",
+  "total_submissions": 28,
+  "detection_pattern": {
+    "ai":           3,  "ai_pct":        10.7,
+    "human":        5,  "human_pct":     17.9,
+    "uncertain":   20,  "uncertain_pct": 71.4
+  },
+  "appeal_stats": {
+    "total_appeals":    6,
+    "appeal_rate":      0.2143,
+    "appeal_rate_pct":  21.4
+  },
+  "confidence_stats": {
+    "overall_avg":     0.41,
+    "by_verdict":      { "ai": 0.637, "human": 0.606, "uncertain": 0.327 },
+    "high_confidence": 4,
+    "med_confidence":  21,
+    "low_confidence":  3
+  },
+  "recent_24h":          { "submissions": 28, "appeals": 6 },
+  "certificates_issued": 1
+}
+```
+
+**The 5 metrics:**
+1. **Detection pattern** — ratio of ai/human/uncertain verdicts (with %)
+2. **Appeal rate** — fraction of submissions that got appealed (21.4% here)
+3. **Confidence stats** — overall avg + by verdict + high/med/low distribution
+4. **Recent activity** — submissions and appeals in the last 24 hours
+5. **Certificates issued** — total verified-human certificates on the platform
+
+---
+
 ## Repository Structure
 
 ```
 ai201-project4-provenance-guard/
-├── app.py            ← Flask API, rate limiting, all endpoints
+├── app.py            ← Flask API, all endpoints (submit/appeal/verify/stats/log)
 ├── classifier.py     ← Multi-signal detection pipeline (Signals 1, 2, 3)
 ├── confidence.py     ← Confidence scoring + transparency label builder
 ├── appeals.py        ← Appeals workflow
-├── auditor.py        ← SQLite audit log (decisions + appeals tables)
+├── certificate.py    ← Provenance Certificate (verified human credential)
+├── analytics.py      ← Analytics dashboard (detection patterns, appeal rate, etc.)
+├── auditor.py        ← SQLite audit log (decisions + appeals + certificates tables)
 ├── config.py         ← Constants, thresholds, weights, rate limit strings
 ├── planning.md       ← Architecture diagram + all design decisions
 ├── README.md         ← This file

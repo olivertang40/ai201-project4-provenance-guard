@@ -590,8 +590,54 @@ Confirm all three label variants are reachable.
 ## Stretch Features
 
 - [x] **Ensemble detection** — Signal 3 (perplexity proxy), toggle via `"ensemble": true`
-- [ ] Provenance certificate ("verified human" credential)
-- [ ] Analytics dashboard
+- [x] **Provenance certificate** — `POST /verify` + `GET /certificate/<id>`, see below
+- [x] **Analytics dashboard** — `GET /stats`, see below
+- [ ] Multi-modal support
+
+### Provenance Certificate design
+
+A creator earns the "Verified Human" credential by completing an additional
+attestation step on content that was classified as human-written.
+
+**Verification step:** Creator submits `POST /verify` with:
+- `content_id` — must have `verdict="human"` and `confidence >= 0.40`
+- `creator_id` — their identifier
+- `attestation` — a personal statement (min 20 chars) explaining the work
+
+**What the system does:**
+1. Validates content is human-classified with sufficient confidence
+2. Checks no certificate already issued (no duplicates)
+3. Stores certificate in SQLite `certificates` table
+4. Returns a certificate label distinguishable from the standard label
+
+**How it's displayed — DISTINCT from standard transparency label:**
+
+Standard human label: `badge="HUMAN-WRITTEN"`, `icon="✍️"` — automated only
+
+Certificate label:
+```
+badge:        "VERIFIED HUMAN"
+heading:      "✅ Verified Human-Written"
+icon:         "🏅"
+body:         "The creator has verified authorship of this content through
+               our attestation process."
+detail:       "Certificate ID: [short-id] — Issued: [timestamp]"
+creator_note: "Verified by creator '[id]'. Creator-attested, not a guarantee."
+cert_id:      uuid
+issued_at:    ISO 8601 timestamp
+```
+
+Certificate retrieved via `GET /certificate/<content_id>`.
+
+### Analytics Dashboard design
+
+`GET /stats` returns 5 metrics:
+
+1. **Detection pattern** — ratio of ai/human/uncertain verdicts with percentages
+2. **Appeal stats** — total appeals and appeal_rate (appeals/submissions)
+3. **Confidence stats** — overall avg, avg by verdict, high/med/low distribution
+4. **Recent activity** — submissions and appeals in the last 24 hours
+5. **Certificates issued** — total verified-human certificates
 
 ---
 
