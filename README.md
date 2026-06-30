@@ -312,6 +312,25 @@ Implemented via `flask-limiter`, keyed by remote IP address.
 
 Exceeding a limit returns HTTP 429 with a standard Flask-Limiter error response.
 
+**Rate limit verification** — 12 rapid requests to `POST /submit` (limit: 10/min):
+
+```
+Request 1:  200
+Request 2:  200
+Request 3:  200
+Request 4:  200
+Request 5:  200
+Request 6:  200
+Request 7:  200
+Request 8:  200
+Request 9:  200
+Request 10: 200
+Request 11: 429  ← Too Many Requests
+Request 12: 429  ← Too Many Requests
+```
+
+First 10 succeed; requests 11 and 12 are rejected with 429.
+
 ---
 
 ## Audit Log
