@@ -151,7 +151,8 @@ def appeal():
     """
     data = request.get_json(silent=True) or {}
     content_id = data.get("content_id", "").strip()
-    reason = data.get("reason", "").strip()
+    # Accept both "reason" and "creator_reasoning" (CodePath spec field name)
+    reason = (data.get("reason") or data.get("creator_reasoning") or "").strip()
 
     if not content_id:
         return jsonify({"error": "Field 'content_id' is required."}), 400
@@ -160,8 +161,17 @@ def appeal():
 
     result = submit_appeal(content_id, reason)
 
-    status_code = 200 if result["success"] else 400
-    return jsonify(result), status_code
+    # Mirror CodePath guide shape: content_id + status + message at top level
+    if result["success"]:
+        return jsonify({
+            "content_id": content_id,
+            "status": "under_review",
+            "message": result["message"],
+            "original_verdict": result.get("original_verdict"),
+            "success": True,
+        }), 200
+    else:
+        return jsonify(result), 400
 
 
 # ── GET /log ───────────────────────────────────────────────────────────────
@@ -186,7 +196,9 @@ def log():
         limit = 20
 
     entries = get_log_entries(limit=limit)
-    return jsonify({"count": len(entries), "entries": entries}), 200
+    # Shape matches CodePath guide: {"entries": [...]}
+    # "count" is a convenience bonus — not required by the spec
+    return jsonify({"entries": entries, "count": len(entries)}), 200
 
 
 # ── GET /health ────────────────────────────────────────────────────────────

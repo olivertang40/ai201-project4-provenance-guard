@@ -42,7 +42,7 @@ RATE_LIMIT_APPEAL: str = "30 per day"
 
 # ── Content limits ─────────────────────────────────────────────────────────
 MAX_CONTENT_CHARS: int = 10_000   # ~2 500 words — reasonable for a poem/excerpt
-MIN_CONTENT_CHARS: int = 50       # Avoid noise on trivially short inputs
+MIN_CONTENT_CHARS: int = 20       # Avoid noise on trivially short inputs
 
 # ── Appeal statuses ───────────────────────────────────────────────────────
 STATUS_PENDING: str = "pending"
