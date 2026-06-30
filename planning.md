@@ -595,6 +595,36 @@ Confirm all three label variants are reachable.
 
 ---
 
+## Milestone 4 Calibration Notes
+
+Tested all 4 required inputs from the spec. Key finding:
+
+**TTR (Type-Token Ratio) is unreliable for texts under 150 words.**
+Short texts have artificially high TTR regardless of authorship — a 50-word
+paragraph will have ~85-90% unique words whether human or AI simply because
+there isn't enough repetition at that length. Fix: skip the TTR sub-score
+(default to 0.50 neutral) when `total_words < 150`.
+
+**Result after fix:**
+
+| Input | LLM score | Stylo score | final_score | verdict | confidence |
+|---|---|---|---|---|---|
+| Clearly AI (hedge phrases) | 0.900 | 0.580 | 0.772 | **ai** | 0.544 |
+| Clearly human (casual ramen) | 0.100 | 0.390 | 0.216 | **human** | 0.568 |
+| Borderline: formal academic | 0.800 | 0.470 | 0.668 | **uncertain** | 0.336 |
+| Borderline: lightly edited AI | 0.600 | 0.450 | 0.540 | **uncertain** | 0.080 |
+
+Observations:
+- Clearly AI and clearly human are well-separated (0.772 vs 0.216, gap of 0.556)
+- Both borderline cases correctly land in uncertain — formal academic writing
+  does NOT get falsely labeled as AI (0.668, just below the 0.75 threshold)
+- The lightly edited AI output lands near the center (0.540) — confidence 0.080
+  correctly signals "we genuinely don't know"
+- LLM signal does most of the discriminating work on short texts; stylometric
+  acts as a moderating force, pulling LLM overconfidence toward center
+
+---
+
 ## File Structure
 
 ```

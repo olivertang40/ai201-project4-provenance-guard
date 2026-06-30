@@ -270,8 +270,13 @@ def _score_stylometric_features(f: dict) -> float:
 
     # 2. TTR: very high (>0.85) or very low (<0.40) — both can signal AI
     #    Humans cluster around 0.50–0.75 in creative prose
+    #    NOTE: short texts (< 150 words) naturally have inflated TTR regardless
+    #    of authorship — skip this feature for short inputs to avoid noise.
     ttr = f["ttr"]
-    if ttr > 0.85 or ttr < 0.35:
+    total_words = f.get("total_words", 0)
+    if total_words < 150:
+        sub_scores.append(0.50)   # not enough words to interpret TTR reliably
+    elif ttr > 0.85 or ttr < 0.35:
         sub_scores.append(0.70)
     elif 0.50 <= ttr <= 0.75:
         sub_scores.append(0.25)
