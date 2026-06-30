@@ -338,43 +338,49 @@ Sample audit log entries (from `GET /log`):
 ```json
 [
   {
-    "id": 1,
-    "content_id": "a1b2c3d4-...",
-    "timestamp": "2026-06-29T10:05:44Z",
+    "id": 4,
+    "content_id": "b6f607b1-7891-4fa3-9728-85bcf8e866bb",
+    "creator_id": "test-ai-1",
+    "timestamp": "2026-06-30T06:41:32Z",
     "verdict": "ai",
-    "confidence": 0.78,
-    "raw_score": 0.89,
-    "llm_score": 0.91,
-    "stylometric_score": 0.86,
-    "content_preview": "In today's rapidly evolving landscape, it is worth noting that creativity takes many forms...",
-    "status": "pending"
-  },
-  {
-    "id": 2,
-    "content_id": "e5f6g7h8-...",
-    "timestamp": "2026-06-29T10:10:11Z",
-    "verdict": "human",
-    "confidence": 0.84,
-    "raw_score": 0.08,
-    "llm_score": 0.05,
-    "stylometric_score": 0.13,
-    "content_preview": "My grandmother smelled of lavender and old coffee, and she kept a jar of buttons...",
-    "status": "pending"
-  },
-  {
-    "id": 3,
-    "content_id": "i9j0k1l2-...",
-    "timestamp": "2026-06-29T10:15:32Z",
-    "verdict": "uncertain",
-    "confidence": 0.12,
-    "raw_score": 0.56,
-    "llm_score": 0.62,
-    "stylometric_score": 0.47,
-    "content_preview": "It was a dark and stormy night, the kind that makes you forget what warmth felt like...",
+    "confidence": 0.544,
+    "raw_score": 0.772,
+    "llm_score": 0.9,
+    "stylometric_score": 0.58,
+    "content_preview": "Artificial intelligence represents a transformative paradigm shift in modern society. It is important to note that while the benefits of AI are numerous...",
     "status": "under_review"
+  },
+  {
+    "id": 5,
+    "content_id": "6ec01d31-d71c-4835-aa26-a30b9370e64d",
+    "creator_id": "test-human-2",
+    "timestamp": "2026-06-30T06:41:49Z",
+    "verdict": "human",
+    "confidence": 0.688,
+    "raw_score": 0.156,
+    "llm_score": 0.0,
+    "stylometric_score": 0.39,
+    "content_preview": "ok so i finally tried that new ramen place downtown and honestly? underwhelming. the broth was fine but they put WAY too much sodium in it...",
+    "status": "pending"
+  },
+  {
+    "id": 6,
+    "content_id": "cb82a849-73c1-467a-a7af-0afc7850b08d",
+    "creator_id": "test-border-3",
+    "timestamp": "2026-06-30T06:42:03Z",
+    "verdict": "uncertain",
+    "confidence": 0.336,
+    "raw_score": 0.668,
+    "llm_score": 0.8,
+    "stylometric_score": 0.47,
+    "content_preview": "The relationship between monetary policy and asset price inflation has been extensively studied in the literature...",
+    "status": "pending"
   }
 ]
 ```
+
+Note: entry `id=4` shows `status: "under_review"` — the creator submitted an appeal
+contesting the AI verdict, which flipped the status and logged the appeal separately.
 
 ---
 
