@@ -34,7 +34,7 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             stylometric_score REAL,
             content_preview TEXT,
             creator_id      TEXT NOT NULL DEFAULT 'anonymous',
-            status          TEXT NOT NULL DEFAULT 'pending'
+            status          TEXT NOT NULL DEFAULT 'classified'
         );
 
         CREATE TABLE IF NOT EXISTS appeals (
@@ -102,7 +102,10 @@ def get_log_entries(limit: int = 50) -> list[dict]:
         "SELECT * FROM decisions ORDER BY id DESC LIMIT ?", (limit,)
     ).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    entries = [dict(r) for r in rows]
+    for entry in entries:
+        entry["attribution"] = entry["verdict"]
+    return entries
 
 
 def get_decision(content_id: str) -> dict | None:

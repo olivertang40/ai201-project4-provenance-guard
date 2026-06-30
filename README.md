@@ -331,7 +331,7 @@ Every attribution decision is recorded in `logs/provenance.db` (SQLite).
 | `llm_score`        | LLM signal score                                 |
 | `stylometric_score`| Stylometric signal score                         |
 | `content_preview`  | First 300 characters of submitted content        |
-| `status`           | `pending` / `under_review` / `resolved`          |
+| `status`           | `classified` / `under_review` / `resolved`       |
 
 Sample audit log entries (from `GET /log`):
 
@@ -343,6 +343,7 @@ Sample audit log entries (from `GET /log`):
     "creator_id": "test-ai-1",
     "timestamp": "2026-06-30T06:41:32Z",
     "verdict": "ai",
+    "attribution": "ai",
     "confidence": 0.544,
     "raw_score": 0.772,
     "llm_score": 0.9,
@@ -356,12 +357,13 @@ Sample audit log entries (from `GET /log`):
     "creator_id": "test-human-2",
     "timestamp": "2026-06-30T06:41:49Z",
     "verdict": "human",
+    "attribution": "human",
     "confidence": 0.688,
     "raw_score": 0.156,
     "llm_score": 0.0,
     "stylometric_score": 0.39,
     "content_preview": "ok so i finally tried that new ramen place downtown and honestly? underwhelming. the broth was fine but they put WAY too much sodium in it...",
-    "status": "pending"
+    "status": "classified"
   },
   {
     "id": 6,
@@ -369,12 +371,13 @@ Sample audit log entries (from `GET /log`):
     "creator_id": "test-border-3",
     "timestamp": "2026-06-30T06:42:03Z",
     "verdict": "uncertain",
+    "attribution": "uncertain",
     "confidence": 0.336,
     "raw_score": 0.668,
     "llm_score": 0.8,
     "stylometric_score": 0.47,
     "content_preview": "The relationship between monetary policy and asset price inflation has been extensively studied in the literature...",
-    "status": "pending"
+    "status": "classified"
   }
 ]
 ```
